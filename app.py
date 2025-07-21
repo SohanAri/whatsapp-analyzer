@@ -4,7 +4,6 @@ import matplotlib.pyplot as plt
 import helper
 import preprocessor
 from helper import most_busy_users
-
 st.sidebar.title('Whatsapp Chat Analyzer')
 
 # In your main Streamlit app file
@@ -88,8 +87,54 @@ if uploaded_file is not None:
         # now i want to show a bar graph
         fig, ax = plt.subplots()
         ax.barh(most_common_df[0], most_common_df[1], color='green')
-        ax.set_xlabel("words")
-        ax.set_ylabel("counter")
+        ax.set_xlabel("Counter")
+        ax.set_ylabel("Words")
         plt.xticks(rotation='vertical')
         st.pyplot(fig)
-        st.dataframe(most_common_df)
+        #st.dataframe(most_common_df)
+
+        # months trends
+        mf= helper.month_trends(selected_user,df)
+        st.title("Monthly Trends")
+        if selected_user == 'Overall':
+            st.header("Monthly User Activity")
+            fig, ax = plt.subplots()
+
+            # Use the DataFrame's plot method and tell it to draw on your Matplotlib axes
+            mf.plot(kind='line', ax=ax)
+
+            # Now you can customize the Matplotlib plot
+            ax.set_xlabel("Month")
+            ax.set_ylabel("Number of Messages")
+            ax.legend(title='User')
+            plt.xticks(rotation='vertical')
+
+            # Display the Matplotlib figure in Streamlit
+            st.pyplot(fig)
+        else:
+            mmf = helper.month_trends("Overall",df)
+            col1,col2 = st.columns(2)
+            with col1:
+                fig, ax = plt.subplots()
+                ax.set_xlabel("Months")
+                ax.set_ylabel("Messages")
+                ax.bar(mf['month'], mf['messages'], color='green')
+                plt.xticks(rotation='vertical')
+                st.pyplot(fig)
+            with col2:
+                fig, ax = plt.subplots()
+
+                # Use the DataFrame's plot method and tell it to draw on your Matplotlib axes
+                mf.plot(kind='line', ax=ax)
+
+                # Now you can customize the Matplotlib plot
+                ax.set_xlabel("Month")
+                ax.set_ylabel("Number of Messages")
+                ax.legend(title='User')
+                plt.xticks(rotation='vertical')
+
+                # Display the Matplotlib figure in Streamlit
+                st.pyplot(fig)
+
+
+

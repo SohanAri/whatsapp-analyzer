@@ -31,7 +31,7 @@ def create_word_cloud(selected_user,df):
     if selected_user != 'Overall':
         df = df[df['user'] == selected_user]
     ndf=df[df['message']!='<Media omitted>\n']
-    mdf=ndf[ndf['user']!='notification']
+    mdf=ndf[ndf['user']!='group_notification']
     wc = WordCloud(width = 800, height = 800, background_color = 'white')
     df_wc = wc.generate(mdf['message'].str.cat(sep=" "))
     return df_wc
@@ -44,7 +44,7 @@ def most_common_words(selected_user,df):
     #remove the media omitted data
     df = df[df['message']!='<Media omitted>\n']
     #remove the group notifications
-    df = df[df['user']!='notification']
+    df = df[df['user']!='group_notification']
     #remove stop words
     words=[]
     for messages in df['message']:
@@ -53,3 +53,43 @@ def most_common_words(selected_user,df):
                  words.append(word)
     rdf = pd.DataFrame(Counter(words).most_common(20))
     return rdf
+
+def month_trends(selected_user,df):
+    if selected_user == 'Overall':
+        df = df[df['user'] != 'group_notification']
+        users = df['user'].unique()
+        months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October',
+                  'November', 'December']
+
+        # 1. Create a dictionary to hold all the data
+        user_activity_data = {'Month': months}
+
+        # 2. Loop through each user and add their message counts to the dictionary
+        for user in users:
+            messages = []
+            for month in months:
+                # Count messages for the specific user in the specific month
+                num_msg = len(df[(df['user'] == user) & (df['month'] == month)])
+                messages.append(num_msg)
+
+            # Use the user's name as the key for their message list
+            user_activity_data[user] = messages
+
+        # 3. Create the DataFrame from the complete dictionary
+        mf = pd.DataFrame(user_activity_data)
+        mf.set_index('Month', inplace=True)
+
+        print(mf)
+        return mf
+
+    else :
+        df = df[df['user'] == selected_user]
+    months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December']
+    messages=[]
+    for month in months:
+        num_msg = len(df[df['month']==month])
+        messages.append(num_msg)
+    comb = list(zip(months, messages))
+    mf = pd.DataFrame(comb,columns=['month','messages'])
+    #print(mf)
+    return mf
