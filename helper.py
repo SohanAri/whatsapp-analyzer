@@ -2,6 +2,8 @@ from urlextract import URLExtract
 from wordcloud import WordCloud
 import pandas as pd
 from collections import Counter
+import emoji
+
 extractor = URLExtract()
 def fetch_stats(selected_user,df):
     if selected_user != 'Overall':
@@ -79,7 +81,7 @@ def month_trends(selected_user,df):
         mf = pd.DataFrame(user_activity_data)
         mf.set_index('Month', inplace=True)
 
-        print(mf)
+        #print(mf)
         return mf
 
     else :
@@ -93,3 +95,11 @@ def month_trends(selected_user,df):
     mf = pd.DataFrame(comb,columns=['month','messages'])
     #print(mf)
     return mf
+
+def emojis_anal(selected_user,df):
+    if selected_user != 'Overall':
+        df = df[df['user'] == selected_user]
+    emojis = []
+    for message in df['message']:
+        emojis.extend([c for c in message if c in emoji.EMOJI_DATA])
+    return pd.DataFrame(Counter(emojis).most_common(len(Counter(emojis))))

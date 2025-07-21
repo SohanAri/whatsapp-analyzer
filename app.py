@@ -118,7 +118,7 @@ if uploaded_file is not None:
                 fig, ax = plt.subplots()
                 ax.set_xlabel("Months")
                 ax.set_ylabel("Messages")
-                ax.bar(mf['month'], mf['messages'], color='green')
+                ax.bar(mf['month'], mf['messages'], color='blue')
                 plt.xticks(rotation='vertical')
                 st.pyplot(fig)
             with col2:
@@ -135,6 +135,18 @@ if uploaded_file is not None:
 
                 # Display the Matplotlib figure in Streamlit
                 st.pyplot(fig)
+        #emojis
+        ef = helper.emojis_anal(selected_user,df)
+        st.title("Emoji Analsis")
+        col1,col2 = st.columns(2)
+        with col1:
+            st.dataframe(ef)
+        with col2:
+            fig, ax = plt.subplots()
+            ax.pie(ef[1].head(10),labels=ef[0].head(10),autopct='%1.1f%%')
+            st.pyplot(fig)
+
+
 
 
 
