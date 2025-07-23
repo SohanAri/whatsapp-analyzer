@@ -11,7 +11,13 @@ def fetch_stats(selected_user,df):
 
     num_messages = df.shape[0]
     words = []
+    dmc = 0
+    dme = 0
     for message in df['message']:
+        if 'This message was deleted' in message:
+            dmc=dmc+1
+        elif '<This message was edited>' in message:
+            dme = dme+1
         words.extend(message.split())
     num_words = len(words)
     num_media = len(df[df['message']=='<Media omitted>\n'])
@@ -19,7 +25,7 @@ def fetch_stats(selected_user,df):
     for message in df['message']:
         links.extend(extractor.find_urls(message))
     num_link = len(links)
-    return num_messages, num_words, num_media, num_link
+    return num_messages, num_words, num_media, num_link, dmc, dme
 
 def most_busy_users(df):
     if len(df['user'].unique()) ==2 :
@@ -103,3 +109,24 @@ def emojis_anal(selected_user,df):
     for message in df['message']:
         emojis.extend([c for c in message if c in emoji.EMOJI_DATA])
     return pd.DataFrame(Counter(emojis).most_common(len(Counter(emojis))))
+
+def timeline(selected_user,df):
+    if selected_user != 'Overall':
+        df = df[df['user'] == selected_user]
+    df['month_num'] = df['date'].dt.month_name()
+    tf = df.groupby(['year','month_num','month']).count()['message'].reset_index()
+    time = []
+
+    for i in range(tf.shape[0]):
+        exp = tf['month'][i] + '-' + str(tf['year'][i])
+        time.append(exp)
+    tf['time'] = time
+    return tf
+
+def dating(selected_user,df):
+    if selected_user != 'Overall':
+        df = df[df['user'] == selected_user]
+    df['only_date']= df['date'].dt.date
+    daily_timeline = df.groupby('only_date').count()['message'].reset_index()
+    return daily_timeline
+
